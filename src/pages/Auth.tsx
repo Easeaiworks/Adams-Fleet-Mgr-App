@@ -16,6 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Truck, Car, Shield } from 'lucide-react';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -39,9 +40,9 @@ const Auth = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     const { error } = await signIn(email, password);
-    
+
     if (error) {
       toast({
         title: 'Error',
@@ -51,8 +52,7 @@ const Auth = () => {
       setIsLoading(false);
       return;
     }
-    
-    // Check if user is approved or blocked
+
     const { data: { user: authUser } } = await supabase.auth.getUser();
     if (authUser) {
       const { data: profile, error: profileError } = await supabase
@@ -60,8 +60,7 @@ const Auth = () => {
         .select('is_approved, is_blocked')
         .eq('id', authUser.id)
         .single();
-      
-      // SECURITY: If no profile exists, deny access - this closes the loop on orphaned auth users
+
       if (!profile || profileError) {
         await supabase.auth.signOut();
         toast({
@@ -72,7 +71,7 @@ const Auth = () => {
         setIsLoading(false);
         return;
       }
-      
+
       if (profile.is_blocked) {
         await supabase.auth.signOut();
         toast({
@@ -83,7 +82,7 @@ const Auth = () => {
         setIsLoading(false);
         return;
       }
-      
+
       if (!profile.is_approved) {
         await supabase.auth.signOut();
         toast({
@@ -95,7 +94,7 @@ const Auth = () => {
         return;
       }
     }
-    
+
     toast({
       title: 'Success',
       description: 'Signed in successfully',
@@ -105,7 +104,7 @@ const Auth = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (password !== confirmPassword) {
       toast({
         title: 'Error',
@@ -125,11 +124,10 @@ const Auth = () => {
     }
 
     setIsLoading(true);
-    
+
     const { error } = await signUp(email, password, fullName);
-    
+
     if (error) {
-      // Handle "user already exists" error with helpful message
       if (error.message?.includes('already registered') || error.message?.includes('already exists')) {
         toast({
           title: 'Account Already Exists',
@@ -145,7 +143,6 @@ const Auth = () => {
         });
       }
     } else {
-      // Sign out immediately to prevent auto-login
       await supabase.auth.signOut();
       setEmail('');
       setPassword('');
@@ -153,13 +150,13 @@ const Auth = () => {
       setFullName('');
       setShowPendingApproval(true);
     }
-    
+
     setIsLoading(false);
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email) {
       toast({
         title: 'Error',
@@ -192,7 +189,6 @@ const Auth = () => {
     setIsLoading(false);
   };
 
-  // Handle password reset callback
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('reset') === 'true') {
@@ -203,21 +199,61 @@ const Auth = () => {
     }
   }, [toast]);
 
+  const LogoSection = () => (
+    <div className="flex flex-col items-center mb-2">
+      <div className="relative mb-4">
+        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-500/30 animate-scale-in">
+          <Truck className="w-10 h-10 text-white" />
+        </div>
+        <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-lg bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center shadow-md">
+          <Car className="w-4 h-4 text-white" />
+        </div>
+      </div>
+    </div>
+  );
+
+  const FeatureBadges = () => (
+    <div className="flex flex-wrap justify-center gap-2 mt-4 mb-2">
+      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+        <Truck className="w-3 h-3" /> Fleet Tracking
+      </span>
+      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+        <Shield className="w-3 h-3" /> Enterprise Security
+      </span>
+      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-violet-50 text-violet-700 border border-violet-200">
+        <Car className="w-3 h-3" /> Vehicle Management
+      </span>
+    </div>
+  );
+
   if (showForgotPassword) {
     return (
-      <div className="min-h-screen min-h-[100dvh] flex flex-col bg-gradient-to-br from-background via-background to-muted overflow-y-auto">
-        <div className="flex-1 flex items-center justify-center p-4 py-8">
-          <Card className="w-full max-w-md shadow-elevated my-auto">
-            <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl font-bold text-center">Reset Password</CardTitle>
-              <CardDescription className="text-center">
+      <div className="min-h-screen min-h-[100dvh] flex flex-col overflow-y-auto relative" style={{
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 25%, #1e40af 50%, #3b82f6 75%, #0ea5e9 100%)'
+      }}>
+        {/* Animated background shapes */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-[-10%] left-[-5%] w-72 h-72 bg-blue-400/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-[-10%] right-[-5%] w-96 h-96 bg-sky-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-[40%] right-[10%] w-48 h-48 bg-indigo-400/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }} />
+        </div>
+
+        <div className="flex-1 flex items-center justify-center p-4 py-8 relative z-10">
+          <Card className="w-full max-w-md my-auto border-0 shadow-2xl shadow-black/20 animate-fade-in" style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(20px)',
+          }}>
+            <CardHeader className="space-y-1 pb-4">
+              <LogoSection />
+              <CardTitle className="text-2xl font-bold text-center bg-gradient-to-r from-blue-700 to-blue-500 bg-clip-text text-transparent">Reset Password</CardTitle>
+              <CardDescription className="text-center text-slate-500">
                 Enter your email and we'll send you a link to reset your password
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleForgotPassword} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="reset-email">Email</Label>
+                  <Label htmlFor="reset-email" className="text-slate-700 font-medium">Email</Label>
                   <Input
                     id="reset-email"
                     type="email"
@@ -225,15 +261,16 @@ const Auth = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    className="h-11 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all"
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button type="submit" className="w-full h-11 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-lg shadow-blue-500/25 transition-all duration-200 hover:shadow-blue-500/40" disabled={isLoading}>
                   {isLoading ? 'Sending...' : 'Send Reset Link'}
                 </Button>
                 <Button
                   type="button"
                   variant="ghost"
-                  className="w-full"
+                  className="w-full text-slate-500 hover:text-slate-700"
                   onClick={() => setShowForgotPassword(false)}
                 >
                   Back to Sign In
@@ -242,34 +279,51 @@ const Auth = () => {
             </CardContent>
           </Card>
         </div>
-        <footer className="py-4 text-center">
-          <p className="text-sm text-muted-foreground">Powered by Refinish AI</p>
+        <footer className="py-4 text-center relative z-10">
+          <p className="text-sm text-blue-200/60">Powered by Ease AI Works</p>
         </footer>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen min-h-[100dvh] flex flex-col bg-gradient-to-br from-background via-background to-muted overflow-y-auto">
-      <div className="flex-1 flex items-center justify-center p-4 py-8">
-        <Card className="w-full max-w-md shadow-elevated my-auto">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-3xl font-bold text-center">Ease AI Fleet Mgr</CardTitle>
-            <CardDescription className="text-center">
+    <div className="min-h-screen min-h-[100dvh] flex flex-col overflow-y-auto relative" style={{
+      background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 25%, #1e40af 50%, #3b82f6 75%, #0ea5e9 100%)'
+    }}>
+      {/* Animated background shapes */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-5%] w-72 h-72 bg-blue-400/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-5%] w-96 h-96 bg-sky-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-[40%] right-[10%] w-48 h-48 bg-indigo-400/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-[20%] left-[15%] w-32 h-32 bg-cyan-400/8 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '3s' }} />
+      </div>
+
+      <div className="flex-1 flex items-center justify-center p-4 py-8 relative z-10">
+        <Card className="w-full max-w-md my-auto border-0 shadow-2xl shadow-black/20 animate-fade-in" style={{
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(20px)',
+        }}>
+          <CardHeader className="space-y-1 pb-2">
+            <LogoSection />
+            <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-blue-700 to-blue-500 bg-clip-text text-transparent">
+              Ease AI Fleet Mgr
+            </CardTitle>
+            <CardDescription className="text-center text-slate-500">
               Manage your vehicle fleet efficiently
             </CardDescription>
+            <FeatureBadges />
           </CardHeader>
           <CardContent>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="signin">Sign In</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 bg-slate-100/80 p-1 rounded-lg">
+                <TabsTrigger value="signin" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-blue-700 font-medium transition-all">Sign In</TabsTrigger>
+                <TabsTrigger value="signup" className="rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-blue-700 font-medium transition-all">Sign Up</TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="signin">
-                <form onSubmit={handleSignIn} className="space-y-4">
+                <form onSubmit={handleSignIn} className="space-y-4 mt-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email" className="text-slate-700 font-medium">Email</Label>
                     <Input
                       id="email"
                       type="email"
@@ -277,36 +331,38 @@ const Auth = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
+                      className="h-11 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password" className="text-slate-700 font-medium">Password</Label>
                     <Input
                       id="password"
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
+                      className="h-11 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all"
                     />
                   </div>
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button type="submit" className="w-full h-11 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-lg shadow-blue-500/25 transition-all duration-200 hover:shadow-blue-500/40 font-semibold" disabled={isLoading}>
                     {isLoading ? 'Signing in...' : 'Sign In'}
                   </Button>
                   <Button
                     type="button"
                     variant="link"
-                    className="w-full text-sm text-muted-foreground"
+                    className="w-full text-sm text-slate-400 hover:text-blue-600 transition-colors"
                     onClick={() => setShowForgotPassword(true)}
                   >
                     Forgot your password?
                   </Button>
                 </form>
               </TabsContent>
-              
+
               <TabsContent value="signup">
-                <form onSubmit={handleSignUp} className="space-y-4">
+                <form onSubmit={handleSignUp} className="space-y-4 mt-4">
                   <div className="space-y-2">
-                    <Label htmlFor="fullname">Full Name</Label>
+                    <Label htmlFor="fullname" className="text-slate-700 font-medium">Full Name</Label>
                     <Input
                       id="fullname"
                       type="text"
@@ -314,10 +370,11 @@ const Auth = () => {
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       required
+                      className="h-11 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
+                    <Label htmlFor="signup-email" className="text-slate-700 font-medium">Email</Label>
                     <Input
                       id="signup-email"
                       type="email"
@@ -325,10 +382,11 @@ const Auth = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
+                      className="h-11 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-password">Password</Label>
+                    <Label htmlFor="signup-password" className="text-slate-700 font-medium">Password</Label>
                     <Input
                       id="signup-password"
                       type="password"
@@ -337,10 +395,11 @@ const Auth = () => {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       minLength={6}
+                      className="h-11 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="confirm-password">Confirm Password</Label>
+                    <Label htmlFor="confirm-password" className="text-slate-700 font-medium">Confirm Password</Label>
                     <Input
                       id="confirm-password"
                       type="password"
@@ -349,9 +408,10 @@ const Auth = () => {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                       minLength={6}
+                      className="h-11 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all"
                     />
                   </div>
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button type="submit" className="w-full h-11 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-lg shadow-blue-500/25 transition-all duration-200 hover:shadow-blue-500/40 font-semibold" disabled={isLoading}>
                     {isLoading ? 'Creating account...' : 'Create Account'}
                   </Button>
                 </form>
@@ -360,8 +420,8 @@ const Auth = () => {
           </CardContent>
         </Card>
       </div>
-      <footer className="py-4 text-center">
-        <p className="text-sm text-muted-foreground">Powered by Refinish AI</p>
+      <footer className="py-4 text-center relative z-10">
+        <p className="text-sm text-blue-200/60">Powered by Ease AI Works</p>
       </footer>
 
       {/* Pending Approval Dialog */}
