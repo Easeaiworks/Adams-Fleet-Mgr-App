@@ -66,7 +66,7 @@ interface FuelExpense {
   byUser: { staffName: string; amount: number; receiptCount: number }[];
 }
 
-const COLORS = ['hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--primary))', 'hsl(var(--destructive))', '#8884d8', '#82ca9d'];
+const COLORS = ['#2563eb', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316', '#ec4899', '#14b8a6', '#6366f1', '#84cc16', '#e11d48'];
 
 export default function Reports() {
   const [expensesByCategory, setExpensesByCategory] = useState<ExpenseByCategory[]>([]);
@@ -1026,8 +1026,8 @@ export default function Reports() {
                             cx="50%"
                             cy="45%"
                             outerRadius={80}
-                            label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
-                            labelLine={false}
+                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                            labelLine={true}
                           >
                             {expensesByCategory.map((entry, index) => (
                               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

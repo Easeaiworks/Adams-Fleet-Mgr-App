@@ -72,7 +72,7 @@ interface FuelExpense {
   byVehicle: { vehicleId: string; plate: string; make: string | null; model: string | null; branchName: string; branchId: string; amount: number; receiptCount: number }[];
 }
 
-const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--destructive))', '#8884d8', '#82ca9d', '#ffc658', '#ff7300'];
+const COLORS = ['#2563eb', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316', '#ec4899', '#14b8a6', '#6366f1', '#84cc16', '#e11d48'];
 
 export default function Expenses() {
   const [branches, setBranches] = useState<Branch[]>([]);
@@ -606,8 +606,8 @@ export default function Expenses() {
                           cx="50%"
                           cy="40%"
                           outerRadius={50}
-                          label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
-                          labelLine={false}
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                          labelLine={true}
                         >
                           {branchSummaries.map((_, index) => (
                             <Cell key={`cell-branch-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -656,8 +656,8 @@ export default function Expenses() {
                           cx="50%"
                           cy="40%"
                           outerRadius={50}
-                          label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
-                          labelLine={false}
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                          labelLine={true}
                         >
                           {categorySummaries.map((_, index) => (
                             <Cell key={`cell-cat-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -709,8 +709,8 @@ export default function Expenses() {
                           cx="50%"
                           cy="40%"
                           outerRadius={50}
-                          label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
-                          labelLine={false}
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                          labelLine={true}
                         >
                           {vehicleSummaries.map((_, index) => (
                             <Cell key={`cell-veh-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -765,8 +765,8 @@ export default function Expenses() {
                           cx="50%"
                           cy="40%"
                           outerRadius={50}
-                          label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
-                          labelLine={false}
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                          labelLine={true}
                         >
                           {fuelExpenses.byBranch.map((_, index) => (
                             <Cell key={`cell-fuel-${index}`} fill={COLORS[index % COLORS.length]} />
