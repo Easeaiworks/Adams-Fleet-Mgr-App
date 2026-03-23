@@ -56,7 +56,7 @@ export function Layout({ children }: LayoutProps) {
                   variant="outline"
                   size="sm"
                   onClick={handleSignOut}
-                  className="gap-2 transition-all duration-200 border-white/30 text-white hover:bg-white/20 hover:text-white"
+                  className="gap-2 transition-all duration-200 border-white/40 text-white bg-white/15 hover:bg-white/25 hover:text-white"
                 >
                   <LogOut className="h-4 w-4" />
                   Sign Out
