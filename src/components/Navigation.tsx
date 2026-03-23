@@ -1,13 +1,15 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Home, BarChart3, CheckSquare, Settings, CircleDot, ClipboardCheck, Receipt } from 'lucide-react';
+import { Home, BarChart3, CheckSquare, Settings, CircleDot, ClipboardCheck, Receipt, CreditCard, Shield } from 'lucide-react';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useSuperAdmin } from '@/hooks/useSuperAdmin';
 import { FuelReceiptDialog } from './FuelReceiptDialog';
 
 export function Navigation() {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAdmin, isAdminOrManager } = useUserRole();
+  const { isSuperAdmin } = useSuperAdmin();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -89,6 +91,32 @@ export function Navigation() {
         >
           <Settings className="h-4 w-4" />
           Admin
+        </Button>
+      )}
+
+      {/* Pricing - visible to company admins */}
+      {isAdminOrManager && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate('/pricing')}
+          className={navClass('/pricing')}
+        >
+          <CreditCard className="h-4 w-4" />
+          Billing
+        </Button>
+      )}
+
+      {/* Super Admin - only visible to super admins */}
+      {isSuperAdmin && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate('/super-admin')}
+          className={`${navClass('/super-admin')} !text-amber-300 hover:!text-amber-200`}
+        >
+          <Shield className="h-4 w-4" />
+          Super Admin
         </Button>
       )}
     </nav>
