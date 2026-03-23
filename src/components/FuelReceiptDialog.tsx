@@ -423,7 +423,7 @@ export function FuelReceiptDialog({ trigger, onReceiptAdded }: FuelReceiptDialog
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           {trigger || (
-            <Button variant="outline" size="sm" className="gap-2">
+            <Button variant="ghost" size="sm" className="gap-2 text-blue-100 hover:bg-white/10 hover:text-white border border-white/20 bg-white/10">
               <Fuel className="h-4 w-4" />
               <span className="hidden sm:inline">Fuel Receipt</span>
             </Button>

@@ -43,8 +43,8 @@ All colors MUST be HSL.
 
     --gradient-primary: linear-gradient(135deg, hsl(217 91% 52%), hsl(210 100% 50%));
     --gradient-accent: linear-gradient(135deg, hsl(180 100% 45%), hsl(210 100% 50%));
-    --shadow-card: 0 2px 8px -1px hsl(215 20% 12% / 0.08), 0 1px 3px -1px hsl(215 20% 12% / 0.04);
-    --shadow-elevated: 0 12px 32px -4px hsl(215 20% 12% / 0.12), 0 6px 16px -2px hsl(215 20% 12% / 0.06);
+    --shadow-card: 0 4px 16px -2px hsl(215 20% 12% / 0.12), 0 2px 6px -1px hsl(215 20% 12% / 0.08);
+    --shadow-elevated: 0 16px 48px -8px hsl(215 20% 12% / 0.18), 0 8px 24px -4px hsl(215 20% 12% / 0.10);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 98%;
@@ -126,15 +126,15 @@ All colors MUST be HSL.
 /* Glassmorphism utilities */
 @layer components {
   .glass {
-    @apply bg-white/80 backdrop-blur-md border border-white/20;
+    @apply bg-white/85 backdrop-blur-lg border border-slate-200/50 shadow-[0_4px_16px_-2px_rgba(0,0,0,0.1)];
   }
 
   .glass-elevated {
-    @apply bg-white/90 backdrop-blur-xl border border-white/30 shadow-lg;
+    @apply bg-white/92 backdrop-blur-xl border border-slate-200/60 shadow-[0_12px_40px_-8px_rgba(0,0,0,0.15),0_4px_12px_-2px_rgba(0,0,0,0.08)];
   }
 
   .card-hover {
-    @apply transition-all duration-300 hover:shadow-lg hover:translate-y-[-2px];
+    @apply transition-all duration-300 hover:shadow-[0_12px_36px_-6px_rgba(0,0,0,0.15)] hover:translate-y-[-2px];
   }
 
   .smooth-transition {

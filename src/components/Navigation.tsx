@@ -14,8 +14,8 @@ export function Navigation() {
   const navClass = (path: string) =>
     `gap-2 px-3 relative transition-all duration-200 hover:scale-105 ${
       isActive(path)
-        ? 'bg-white/20 text-white border-b-2 border-white hover:bg-white/30 hover:text-white'
-        : 'text-blue-100 hover:bg-white/10 hover:text-white'
+        ? 'bg-white/25 text-white font-semibold border-b-2 border-white shadow-[0_0_12px_rgba(255,255,255,0.3)] hover:bg-white/35 hover:text-white'
+        : 'text-white/70 hover:bg-white/10 hover:text-white'
     }`;
 
   return (
