@@ -221,7 +221,7 @@ const Auth = () => {
                   <Input
                     id="reset-email"
                     type="email"
-                    placeholder="your.email@chc.com"
+                    placeholder="your.email@company.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -254,7 +254,7 @@ const Auth = () => {
       <div className="flex-1 flex items-center justify-center p-4 py-8">
         <Card className="w-full max-w-md shadow-elevated my-auto">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-3xl font-bold text-center">CHC Fleet Manager</CardTitle>
+            <CardTitle className="text-3xl font-bold text-center">Ease AI Fleet Mgr</CardTitle>
             <CardDescription className="text-center">
               Manage your vehicle fleet efficiently
             </CardDescription>
@@ -273,7 +273,7 @@ const Auth = () => {
                     <Input
                       id="email"
                       type="email"
-                      placeholder="your.email@chc.com"
+                      placeholder="your.email@company.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -321,7 +321,7 @@ const Auth = () => {
                     <Input
                       id="signup-email"
                       type="email"
-                      placeholder="your.email@chc.com"
+                      placeholder="your.email@company.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required

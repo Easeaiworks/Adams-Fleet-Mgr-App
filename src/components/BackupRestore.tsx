@@ -19,8 +19,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-const BACKUP_DATE_KEY = 'chc-fleet-last-backup-date';
-const BACKUP_REMINDER_DISMISSED_KEY = 'chc-fleet-backup-reminder-dismissed';
+const BACKUP_DATE_KEY = 'easeai-fleet-last-backup-date';
+const BACKUP_REMINDER_DISMISSED_KEY = 'easeai-fleet-backup-reminder-dismissed';
 const BACKUP_REMINDER_DAYS = 7;
 
 interface StorageFile {
@@ -347,7 +347,7 @@ export function BackupRestore() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `chc-fleet-backup-${format(new Date(), 'yyyy-MM-dd-HHmmss')}.json`;
+      link.download = `easeai-fleet-backup-${format(new Date(), 'yyyy-MM-dd-HHmmss')}.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -648,7 +648,7 @@ export function BackupRestore() {
       const url = URL.createObjectURL(zipBlob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `chc-fleet-documents-${format(new Date(), 'yyyy-MM-dd-HHmmss')}.zip`;
+      link.download = `easeai-fleet-documents-${format(new Date(), 'yyyy-MM-dd-HHmmss')}.zip`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

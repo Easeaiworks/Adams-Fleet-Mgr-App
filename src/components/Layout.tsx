@@ -32,7 +32,7 @@ export function Layout({ children }: LayoutProps) {
         {/* Top row: Branding and User Info */}
         <div className="container mx-auto px-4 py-4 flex items-center justify-between border-b border-white/20">
           <div className="cursor-pointer transition-transform duration-300 hover:scale-105" onClick={() => navigate('/')}>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">CHC Fleet Manager</h1>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Ease AI Fleet Mgr</h1>
             <p className="text-xs text-muted-foreground">Vehicle Management System</p>
           </div>
           <div className="flex items-center gap-4">
