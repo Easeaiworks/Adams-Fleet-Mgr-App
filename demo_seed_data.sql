@@ -69,9 +69,9 @@ VALUES
   ),
   (
     '1FTFW1ET5DFA34569',
+    'CVB 001',
     'Ford',
     'F-150',
-    'CVB 001',
     2022,
     (SELECT id FROM branches WHERE name = 'Hamilton Location'),
     89400,
@@ -317,7 +317,7 @@ ON CONFLICT DO NOTHING;
 -- Oil Changes (October)
 INSERT INTO expenses (
   vehicle_id, category_id, amount, date,
-  odometer_reading, description, approval_status
+  odometer_reading, description
 )
 VALUES
   (
@@ -440,8 +440,7 @@ VALUES
     425.50,
     '2025-10-28',
     52300,
-    'Engine knock diagnosis and sensor replacement - Mr. Lube - Nicole Sanders',
-    'pending'
+    'Engine knock diagnosis and sensor replacement - Mr. Lube - Nicole Sanders'
   ),
 
 -- Suspension Repair (October)
@@ -469,7 +468,7 @@ VALUES
 -- Oil Changes (November)
 INSERT INTO expenses (
   vehicle_id, category_id, amount, date,
-  odometer_reading, description, approval_status
+  odometer_reading, description
 )
 VALUES
   (
@@ -604,7 +603,7 @@ VALUES
 -- Oil Changes (December)
 INSERT INTO expenses (
   vehicle_id, category_id, amount, date,
-  odometer_reading, description, approval_status
+  odometer_reading, description
 )
 VALUES
   (
@@ -747,7 +746,7 @@ VALUES
 -- Oil Changes (January)
 INSERT INTO expenses (
   vehicle_id, category_id, amount, date,
-  odometer_reading, description, approval_status
+  odometer_reading, description
 )
 VALUES
   (
@@ -864,7 +863,7 @@ VALUES
 -- Oil Changes (February)
 INSERT INTO expenses (
   vehicle_id, category_id, amount, date,
-  odometer_reading, description, approval_status
+  odometer_reading, description
 )
 VALUES
   (
@@ -963,7 +962,7 @@ VALUES
 -- Oil Changes (March)
 INSERT INTO expenses (
   vehicle_id, category_id, amount, date,
-  odometer_reading, description, approval_status
+  odometer_reading, description
 )
 VALUES
   (
