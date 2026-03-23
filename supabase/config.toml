@@ -1,4 +1,4 @@
-project_id = "rwuktiwwunxlpkgrygww"
+project_id = "fjgqiwpghwcykhnrzsgo"
 
 [functions.scan-receipt]
 verify_jwt = true

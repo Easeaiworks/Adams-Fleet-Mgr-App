@@ -5,14 +5,16 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// File types that can be sent directly as images to the vision model
+// Image types Claude supports natively via vision
 const VISION_MIME_TYPES = [
   'image/jpeg',
   'image/png',
   'image/gif',
   'image/webp',
-  'application/pdf', // Gemini supports PDF directly
 ];
+
+// PDF is sent as a document type in Claude's API
+const PDF_MIME_TYPE = 'application/pdf';
 
 // Text-based file types that need text extraction
 const TEXT_MIME_TYPES = [
@@ -22,37 +24,7 @@ const TEXT_MIME_TYPES = [
   'text/tab-separated-values',
 ];
 
-serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
-
-  try {
-    const AI_API_KEY = Deno.env.get("AI_API_KEY");
-    if (!AI_API_KEY) {
-      console.error("AI_API_KEY is not configured");
-      throw new Error("AI_API_KEY is not configured. Set this to your OpenAI-compatible API key.");
-    }
-
-    // Configure your AI endpoint here (OpenAI, Google AI, OpenRouter, etc.)
-    const AI_API_URL = Deno.env.get("AI_API_URL") || "https://openrouter.ai/api/v1/chat/completions";
-
-    const { fileBase64, mimeType, fileName, textContent } = await req.json();
-
-    if (!fileBase64 && !textContent) {
-      console.error("No file or text content provided");
-      return new Response(
-        JSON.stringify({ error: "No file or text content provided" }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    console.log("Processing document:", fileName, "mimeType:", mimeType, "has textContent:", !!textContent);
-
-    let messages: any[];
-
-    const extractionPrompt = `Analyze this receipt/invoice document carefully. 
+const EXTRACTION_PROMPT = `Analyze this receipt/invoice document carefully.
 
 CRITICAL TAX EXTRACTION - This is for Ontario, Canada where HST (Harmonized Sales Tax) is 13%:
 - ALWAYS look for and extract HST, GST, PST, or any tax amounts shown on the invoice
@@ -82,41 +54,150 @@ Extract all information including:
 - SUBTOTAL (amount before tax)
 - TAX AMOUNT (HST/GST/PST - typically 13% in Ontario)
 - TOTAL (grand total including tax)
-- Each expense item with its category suggestion, subtotal, tax, and total amount`;
+- Each expense item with its category suggestion, subtotal, tax, and total amount
+
+Use the extract_receipt_data tool to return the structured data.`;
+
+const RECEIPT_TOOL = {
+  name: "extract_receipt_data",
+  description: "Extract structured data from a receipt, invoice, or expense document. Can extract multiple expense items if the invoice contains different service categories.",
+  input_schema: {
+    type: "object",
+    properties: {
+      vendor_name: {
+        type: "string",
+        description: "The business/store/company name shown on the document"
+      },
+      vendor_address: {
+        type: "string",
+        description: "The address of the business if visible"
+      },
+      date: {
+        type: "string",
+        description: "The document/receipt date in YYYY-MM-DD format"
+      },
+      subtotal: {
+        type: "number",
+        description: "The overall subtotal amount before tax for the entire invoice. This is REQUIRED."
+      },
+      tax_amount: {
+        type: "number",
+        description: "The total tax amount (HST is 13% in Ontario, Canada). Look for HST, GST, PST, Tax, or calculate as total - subtotal. This is REQUIRED - do not leave empty."
+      },
+      total: {
+        type: "number",
+        description: "The grand total amount including tax for the entire invoice"
+      },
+      expense_items: {
+        type: "array",
+        description: "Array of distinct expense items/categories found on the invoice. If only one type of service, return one item. If multiple service types (e.g., oil change AND repairs), return multiple items.",
+        items: {
+          type: "object",
+          properties: {
+            category_suggestion: {
+              type: "string",
+              description: "Suggested expense category: 'Maintenance' for oil changes/routine service, 'Repair' for mechanical repairs, 'Tires' for tire work, 'Parts' for parts only, 'Fuel' for gas, 'Other' otherwise"
+            },
+            description: {
+              type: "string",
+              description: "Description of the service/items in this category"
+            },
+            subtotal: {
+              type: "number",
+              description: "The subtotal for this expense item (before tax allocation). Required for each item."
+            },
+            tax_amount: {
+              type: "number",
+              description: "Proportional HST (13%) tax amount for this expense item. Calculate based on ratio to overall subtotal. Required for each item."
+            },
+            amount: {
+              type: "number",
+              description: "Total amount for this expense item including tax (subtotal + tax_amount)"
+            }
+          },
+          required: ["category_suggestion", "description", "subtotal", "tax_amount", "amount"]
+        }
+      },
+      raw_text: {
+        type: "string",
+        description: "Any additional relevant text found on the document"
+      }
+    },
+    required: ["vendor_name", "subtotal", "tax_amount", "total", "expense_items"],
+  }
+};
+
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) {
+      console.error("ANTHROPIC_API_KEY is not configured");
+      throw new Error("ANTHROPIC_API_KEY is not configured. Get your key at console.anthropic.com");
+    }
+
+    const { fileBase64, mimeType, fileName, textContent } = await req.json();
+
+    if (!fileBase64 && !textContent) {
+      console.error("No file or text content provided");
+      return new Response(
+        JSON.stringify({ error: "No file or text content provided" }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log("Processing document:", fileName, "mimeType:", mimeType, "has textContent:", !!textContent);
+
+    // Build the content array for Claude's Messages API
+    let content: any[];
 
     // If we have pre-extracted text content (for DOCX, CSV, etc.)
     if (textContent) {
       console.log("Using pre-extracted text content, length:", textContent.length);
-      messages = [
+      content = [
         {
-          role: "user",
-          content: `${extractionPrompt}
-
-Document name: "${fileName}"
-
-Document content:
-${textContent}`
+          type: "text",
+          text: `${EXTRACTION_PROMPT}\n\nDocument name: "${fileName}"\n\nDocument content:\n${textContent}`
         }
       ];
-    } 
-    // For vision-compatible files (images and PDFs)
+    }
+    // For images — Claude supports these natively via vision
     else if (VISION_MIME_TYPES.includes(mimeType)) {
-      console.log("Using vision model for:", mimeType);
-      messages = [
+      console.log("Using Claude vision for image:", mimeType);
+      content = [
         {
-          role: "user",
-          content: [
-            {
-              type: "image_url",
-              image_url: {
-                url: `data:${mimeType};base64,${fileBase64}`
-              }
-            },
-            {
-              type: "text",
-              text: extractionPrompt
-            }
-          ]
+          type: "image",
+          source: {
+            type: "base64",
+            media_type: mimeType,
+            data: fileBase64,
+          }
+        },
+        {
+          type: "text",
+          text: EXTRACTION_PROMPT
+        }
+      ];
+    }
+    // For PDFs — Claude supports these as document type
+    else if (mimeType === PDF_MIME_TYPE) {
+      console.log("Using Claude document support for PDF");
+      content = [
+        {
+          type: "document",
+          source: {
+            type: "base64",
+            media_type: "application/pdf",
+            data: fileBase64,
+          }
+        },
+        {
+          type: "text",
+          text: EXTRACTION_PROMPT
         }
       ];
     }
@@ -124,15 +205,10 @@ ${textContent}`
     else if (TEXT_MIME_TYPES.includes(mimeType) || mimeType?.startsWith('text/')) {
       console.log("Decoding text-based file:", mimeType);
       const decodedText = atob(fileBase64);
-      messages = [
+      content = [
         {
-          role: "user",
-          content: `${extractionPrompt}
-
-Document name: "${fileName}"
-
-Document content:
-${decodedText}`
+          type: "text",
+          text: `${EXTRACTION_PROMPT}\n\nDocument name: "${fileName}"\n\nDocument content:\n${decodedText}`
         }
       ];
     }
@@ -140,7 +216,7 @@ ${decodedText}`
     else {
       console.error("Unsupported file type:", mimeType);
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           error: `Unsupported file type: ${mimeType}. Supported types: images (JPEG, PNG, GIF, WebP), PDF, and text files (TXT, CSV).`,
           vendor_name: null,
           total: null,
@@ -150,92 +226,25 @@ ${decodedText}`
       );
     }
 
-    // Call the AI gateway
-    const response = await fetch(AI_API_URL, {
+    // Call Claude's Messages API
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${AI_API_KEY}`,
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages,
-        tools: [
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 4096,
+        tools: [RECEIPT_TOOL],
+        tool_choice: { type: "tool", name: "extract_receipt_data" },
+        messages: [
           {
-            type: "function",
-            function: {
-              name: "extract_receipt_data",
-              description: "Extract structured data from a receipt, invoice, or expense document. Can extract multiple expense items if the invoice contains different service categories.",
-              parameters: {
-                type: "object",
-                properties: {
-                  vendor_name: {
-                    type: "string",
-                    description: "The business/store/company name shown on the document"
-                  },
-                  vendor_address: {
-                    type: "string",
-                    description: "The address of the business if visible"
-                  },
-                  date: {
-                    type: "string",
-                    description: "The document/receipt date in YYYY-MM-DD format"
-                  },
-                  subtotal: {
-                    type: "number",
-                    description: "The overall subtotal amount before tax for the entire invoice. This is REQUIRED."
-                  },
-                  tax_amount: {
-                    type: "number",
-                    description: "The total tax amount (HST is 13% in Ontario, Canada). Look for HST, GST, PST, Tax, or calculate as total - subtotal. This is REQUIRED - do not leave empty."
-                  },
-                  total: {
-                    type: "number",
-                    description: "The grand total amount including tax for the entire invoice"
-                  },
-                  expense_items: {
-                    type: "array",
-                    description: "Array of distinct expense items/categories found on the invoice. If only one type of service, return one item. If multiple service types (e.g., oil change AND repairs), return multiple items.",
-                    items: {
-                      type: "object",
-                      properties: {
-                        category_suggestion: {
-                          type: "string",
-                          description: "Suggested expense category: 'Maintenance' for oil changes/routine service, 'Repair' for mechanical repairs, 'Tires' for tire work, 'Parts' for parts only, 'Fuel' for gas, 'Other' otherwise"
-                        },
-                        description: {
-                          type: "string",
-                          description: "Description of the service/items in this category"
-                        },
-                        subtotal: {
-                          type: "number",
-                          description: "The subtotal for this expense item (before tax allocation). Required for each item."
-                        },
-                        tax_amount: {
-                          type: "number",
-                          description: "Proportional HST (13%) tax amount for this expense item. Calculate based on ratio to overall subtotal. Required for each item."
-                        },
-                        amount: {
-                          type: "number",
-                          description: "Total amount for this expense item including tax (subtotal + tax_amount)"
-                        }
-                      },
-                      required: ["category_suggestion", "description", "subtotal", "tax_amount", "amount"]
-                    }
-                  },
-                  raw_text: {
-                    type: "string",
-                    description: "Any additional relevant text found on the document"
-                  }
-                },
-                required: ["vendor_name", "subtotal", "tax_amount", "total", "expense_items"],
-                additionalProperties: false
-              }
-            }
+            role: "user",
+            content,
           }
         ],
-        tool_choice: { type: "function", function: { name: "extract_receipt_data" } },
-        max_tokens: 3000,
       }),
     });
 
@@ -247,22 +256,15 @@ ${decodedText}`
           { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-      if (response.status === 402) {
-        console.error("Payment required");
-        return new Response(
-          JSON.stringify({ error: "AI credits exhausted. Please add credits to continue." }),
-          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
       const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
-      throw new Error(`AI gateway error: ${response.status}`);
+      console.error("Claude API error:", response.status, errorText);
+      throw new Error(`Claude API error: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log("AI response received:", JSON.stringify(data, null, 2));
+    console.log("Claude response received, stop_reason:", data.stop_reason);
 
-    // Extract data from tool call response
+    // Extract data from Claude's tool_use response
     let extractedData = {
       vendor_name: null as string | null,
       vendor_address: null as string | null,
@@ -274,45 +276,41 @@ ${decodedText}`
       expense_items: [] as any[],
     };
 
-    // Check for tool call response
-    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
-    if (toolCall && toolCall.function?.arguments) {
-      try {
-        const args = JSON.parse(toolCall.function.arguments);
-        console.log("Parsed tool call arguments:", JSON.stringify(args, null, 2));
-        
-        extractedData = {
-          vendor_name: args.vendor_name || null,
-          vendor_address: args.vendor_address || null,
-          subtotal: args.subtotal || null,
-          tax_amount: args.tax_amount || null,
-          total: args.total || null,
-          date: args.date || null,
-          description: args.expense_items?.[0]?.description || null,
-          expense_items: args.expense_items || [],
-        };
+    // Find the tool_use block in Claude's response
+    const toolUseBlock = data.content?.find((block: any) => block.type === "tool_use");
+    if (toolUseBlock && toolUseBlock.input) {
+      const args = toolUseBlock.input;
+      console.log("Parsed tool use input:", JSON.stringify(args, null, 2));
 
-        // If no expense_items were returned but we have a total, create a single item
-        if (extractedData.expense_items.length === 0 && extractedData.total) {
-          extractedData.expense_items = [{
-            category_suggestion: 'Other',
-            description: args.description || 'Invoice expense',
-            subtotal: extractedData.subtotal,
-            tax_amount: extractedData.tax_amount,
-            amount: extractedData.total,
-          }];
-        }
-      } catch (parseError) {
-        console.error("Failed to parse tool call arguments:", parseError);
+      extractedData = {
+        vendor_name: args.vendor_name || null,
+        vendor_address: args.vendor_address || null,
+        subtotal: args.subtotal || null,
+        tax_amount: args.tax_amount || null,
+        total: args.total || null,
+        date: args.date || null,
+        description: args.expense_items?.[0]?.description || null,
+        expense_items: args.expense_items || [],
+      };
+
+      // If no expense_items were returned but we have a total, create a single item
+      if (extractedData.expense_items.length === 0 && extractedData.total) {
+        extractedData.expense_items = [{
+          category_suggestion: 'Other',
+          description: args.description || 'Invoice expense',
+          subtotal: extractedData.subtotal,
+          tax_amount: extractedData.tax_amount,
+          amount: extractedData.total,
+        }];
       }
     } else {
-      // Fallback: try to extract JSON from content
-      const content = data.choices?.[0]?.message?.content;
-      console.log("No tool call found, checking content:", content);
-      
-      if (content) {
+      // Fallback: try to extract JSON from text content blocks
+      const textBlock = data.content?.find((block: any) => block.type === "text");
+      console.log("No tool_use block found, checking text content");
+
+      if (textBlock?.text) {
         try {
-          const jsonMatch = content.match(/\{[\s\S]*\}/);
+          const jsonMatch = textBlock.text.match(/\{[\s\S]*\}/);
           if (jsonMatch) {
             const parsed = JSON.parse(jsonMatch[0]);
             extractedData = {
@@ -327,7 +325,7 @@ ${decodedText}`
             };
           }
         } catch (parseError) {
-          console.error("Failed to parse content as JSON:", parseError);
+          console.error("Failed to parse text content as JSON:", parseError);
         }
       }
     }

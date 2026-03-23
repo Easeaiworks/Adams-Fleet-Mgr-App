@@ -39,4 +39,4 @@ EXECUTE FUNCTION public.update_updated_at_column();
 
 -- Insert initial rule: Oil Change under $100 auto-approved for all branches
 INSERT INTO public.expense_preapproval_rules (branch_id, category_id, max_amount, is_active)
-VALUES (NULL, 'b84b1d4e-69bc-440f-945b-6e971ff31886', 100.00, true);
+VALUES (NULL, (SELECT id FROM public.expense_categories WHERE name = 'Oil Change' LIMIT 1), 100.00, true);
