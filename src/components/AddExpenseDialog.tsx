@@ -656,11 +656,11 @@ export function AddExpenseDialog({ vehicleId, onExpenseAdded, trigger }: AddExpe
           </DialogDescription>
         </DialogHeader>
         
-        <div className="relative flex-1 min-h-0 overflow-hidden">
-          <div 
+        <div className="relative flex-1 min-h-0 overflow-visible">
+          <div
             ref={scrollContainerRef}
             onScroll={checkScrollability}
-            className="h-[65vh] pr-4 overflow-y-auto"
+            className="h-[65vh] pr-4 overflow-y-auto overflow-x-visible"
           >
             <form onSubmit={handleSubmit} className="space-y-4 pb-8">
           {/* Receipt Upload with Scan */}
