@@ -506,13 +506,13 @@ export default function Expenses() {
             <div className="flex flex-col gap-4">
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1">
-                  <label className="text-sm font-medium mb-2 block">Branch</label>
+                  <label className="text-sm font-medium mb-2 block">Location</label>
                   <Select value={selectedBranch} onValueChange={setSelectedBranch}>
                     <SelectTrigger className="bg-background">
-                      <SelectValue placeholder="Select branch" />
+                      <SelectValue placeholder="Select location" />
                     </SelectTrigger>
                     <SelectContent className="bg-background">
-                      <SelectItem value="all">All Branches</SelectItem>
+                      <SelectItem value="all">All Locations</SelectItem>
                       {branches.map((branch) => (
                         <SelectItem key={branch.id} value={branch.id}>
                           {branch.name}
@@ -591,7 +591,7 @@ export default function Expenses() {
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-base">
                     <Building2 className="h-5 w-5 text-primary" />
-                    By Branch
+                    By Location
                   </CardTitle>
                   <CardDescription className="text-xs">Spending per location</CardDescription>
                 </CardHeader>
@@ -916,7 +916,7 @@ export default function Expenses() {
                                       </TableBody>
                                       <TableFooter>
                                         <TableRow className="bg-muted/30">
-                                          <TableCell className="pl-12 font-medium">Branch Total</TableCell>
+                                          <TableCell className="pl-12 font-medium">Location Total</TableCell>
                                           <TableCell className="text-right">{branch.receiptCount}</TableCell>
                                           <TableCell className="text-right font-bold text-amber-600">{formatCurrency(branch.amount)}</TableCell>
                                         </TableRow>

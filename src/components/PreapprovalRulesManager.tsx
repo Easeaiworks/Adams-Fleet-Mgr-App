@@ -94,9 +94,9 @@ export function PreapprovalRulesManager() {
       const enrichedRules = (rulesRes.data || []).map(rule => ({
         ...rule,
         category_name: categoriesRes.data?.find(c => c.id === rule.category_id)?.name || 'Unknown',
-        branch_name: rule.branch_id 
+        branch_name: rule.branch_id
           ? branchesRes.data?.find(b => b.id === rule.branch_id)?.name || 'Unknown'
-          : 'All Branches',
+          : 'All Locations',
       }));
 
       setRules(enrichedRules);
@@ -268,7 +268,7 @@ export function PreapprovalRulesManager() {
             <TableHeader>
               <TableRow>
                 <TableHead>Category</TableHead>
-                <TableHead>Branch</TableHead>
+                <TableHead>Location</TableHead>
                 <TableHead>Max Amount</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -371,16 +371,16 @@ export function PreapprovalRulesManager() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="branch">Branch (optional)</Label>
+              <Label htmlFor="branch">Location (optional)</Label>
               <Select
                 value={formData.branchId}
                 onValueChange={(value) => setFormData(prev => ({ ...prev, branchId: value }))}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="All branches" />
+                  <SelectValue placeholder="All locations" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Branches</SelectItem>
+                  <SelectItem value="">All Locations</SelectItem>
                   {branches.map((branch) => (
                     <SelectItem key={branch.id} value={branch.id}>
                       {branch.name}

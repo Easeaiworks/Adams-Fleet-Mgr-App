@@ -657,7 +657,7 @@ const Admin = () => {
           <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="branches" className="gap-2">
               <Building2 className="h-4 w-4" />
-              <span className="hidden sm:inline">Branches</span>
+              <span className="hidden sm:inline">Locations</span>
             </TabsTrigger>
             <TabsTrigger value="vendors" className="gap-2">
               <Store className="h-4 w-4" />

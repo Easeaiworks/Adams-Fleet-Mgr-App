@@ -418,7 +418,7 @@ export function ReceiptHistory() {
       return;
     }
 
-    const headers = ['Date', 'Vehicle', 'Branch', 'Category', 'Vendor', 'Subtotal', 'Tax', 'Total', 'Receipt Scanned', 'Status', 'Submitted By', 'Description'];
+    const headers = ['Date', 'Vehicle', 'Location', 'Category', 'Vendor', 'Subtotal', 'Tax', 'Total', 'Receipt Scanned', 'Status', 'Submitted By', 'Description'];
     const rows = receipts.map(r => [
       r.date,
       r.vehicle ? `${r.vehicle.make || ''} ${r.vehicle.model || ''} (${r.vehicle.plate})` : 'N/A',
@@ -470,10 +470,10 @@ export function ReceiptHistory() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         <Select value={selectedBranch} onValueChange={setSelectedBranch}>
           <SelectTrigger className="bg-background">
-            <SelectValue placeholder="Branch" />
+            <SelectValue placeholder="Location" />
           </SelectTrigger>
           <SelectContent className="bg-background">
-            <SelectItem value="all">All Branches</SelectItem>
+            <SelectItem value="all">All Locations</SelectItem>
             {branches.map((branch) => (
               <SelectItem key={branch.id} value={branch.id}>
                 {branch.name}
@@ -585,7 +585,7 @@ export function ReceiptHistory() {
               <TableRow>
                 <TableHead>Date</TableHead>
                 <TableHead>Vehicle</TableHead>
-                <TableHead>Branch</TableHead>
+                <TableHead>Location</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Vendor</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
@@ -689,7 +689,7 @@ export function ReceiptHistory() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Branch</p>
+                  <p className="text-sm text-muted-foreground">Location</p>
                   <p className="font-medium">{selectedExpense.branch?.name || 'N/A'}</p>
                 </div>
                 <div>
