@@ -1,7 +1,13 @@
 project_id = "fjgqiwpghwcykhnrzsgo"
 
 [functions.scan-receipt]
-verify_jwt = true
+verify_jwt = false
 
 [functions.cleanup-deleted-expenses]
+verify_jwt = false
+
+[functions.create-checkout-session]
+verify_jwt = false
+
+[functions.stripe-webhook]
 verify_jwt = false
