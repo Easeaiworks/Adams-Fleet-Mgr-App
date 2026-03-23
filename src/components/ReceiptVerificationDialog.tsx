@@ -117,7 +117,7 @@ export function ReceiptVerificationDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="max-w-lg max-h-[90vh] overflow-hidden grid grid-rows-[auto_minmax(0,1fr)_auto] min-h-0">
+      <AlertDialogContent className="max-w-lg max-h-[90vh] overflow-y-auto grid grid-rows-[auto_minmax(0,1fr)_auto] min-h-0">
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
             {isScanning ? (

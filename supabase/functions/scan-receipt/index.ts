@@ -258,7 +258,15 @@ serve(async (req) => {
       }
       const errorText = await response.text();
       console.error("Claude API error:", response.status, errorText);
-      throw new Error(`Claude API error: ${response.status}`);
+      let errorDetail = `Claude API error (${response.status})`;
+      try {
+        const errJson = JSON.parse(errorText);
+        errorDetail = errJson.error?.message || errorDetail;
+      } catch {}
+      return new Response(
+        JSON.stringify({ error: errorDetail }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const data = await response.json();

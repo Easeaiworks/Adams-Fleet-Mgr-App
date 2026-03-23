@@ -237,13 +237,15 @@ export function AddExpenseDialog({ vehicleId, onExpenseAdded, trigger }: AddExpe
       });
 
       if (error) {
-        throw error;
+        console.error('Supabase function error:', error);
+        throw new Error(error.message || 'Edge function call failed. Check that the function is deployed.');
       }
 
       if (data?.error) {
+        console.error('Scan error from edge function:', data.error);
         toast({
-          title: 'Scan Notice',
-          description: data.error,
+          title: 'Receipt Scan Error',
+          description: `AI scan failed: ${data.error}`,
           variant: 'destructive',
         });
         setScannedData({});
@@ -648,7 +650,7 @@ export function AddExpenseDialog({ vehicleId, onExpenseAdded, trigger }: AddExpe
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Add Expense</DialogTitle>
           <DialogDescription>
