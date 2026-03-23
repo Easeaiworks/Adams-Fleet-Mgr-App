@@ -9,59 +9,58 @@ export function Navigation() {
   const navigate = useNavigate();
   const { isAdmin, isAdminOrManager } = useUserRole();
 
+  const isActive = (path: string) => location.pathname === path;
+
+  const navClass = (path: string) =>
+    `gap-2 px-3 relative transition-all duration-200 hover:scale-105 ${
+      isActive(path)
+        ? 'bg-white/20 text-white border-b-2 border-white hover:bg-white/30 hover:text-white'
+        : 'text-blue-100 hover:bg-white/10 hover:text-white'
+    }`;
+
   return (
     <nav className="flex items-center gap-2 flex-wrap">
       <Button
-        variant={location.pathname === '/' ? 'secondary' : 'ghost'}
+        variant="ghost"
         size="sm"
         onClick={() => navigate('/')}
-        className={`gap-2 px-3 relative transition-all duration-200 hover:scale-105 ${
-          location.pathname === '/' ? 'border-b-2 border-secondary' : ''
-        }`}
+        className={navClass('/')}
       >
         <Home className="h-4 w-4" />
         Dashboard
       </Button>
       <Button
-        variant={location.pathname === '/inspections' ? 'secondary' : 'ghost'}
+        variant="ghost"
         size="sm"
         onClick={() => navigate('/inspections')}
-        className={`gap-2 px-3 relative transition-all duration-200 hover:scale-105 ${
-          location.pathname === '/inspections' ? 'border-b-2 border-secondary' : ''
-        }`}
+        className={navClass('/inspections')}
       >
         <ClipboardCheck className="h-4 w-4" />
         Inspections
       </Button>
       <Button
-        variant={location.pathname === '/tires' ? 'secondary' : 'ghost'}
+        variant="ghost"
         size="sm"
         onClick={() => navigate('/tires')}
-        className={`gap-2 px-3 relative transition-all duration-200 hover:scale-105 ${
-          location.pathname === '/tires' ? 'border-b-2 border-secondary' : ''
-        }`}
+        className={navClass('/tires')}
       >
         <CircleDot className="h-4 w-4" />
         Tires
       </Button>
       <Button
-        variant={location.pathname === '/reports' ? 'secondary' : 'ghost'}
+        variant="ghost"
         size="sm"
         onClick={() => navigate('/reports')}
-        className={`gap-2 px-3 relative transition-all duration-200 hover:scale-105 ${
-          location.pathname === '/reports' ? 'border-b-2 border-secondary' : ''
-        }`}
+        className={navClass('/reports')}
       >
         <BarChart3 className="h-4 w-4" />
         Reports
       </Button>
       <Button
-        variant={location.pathname === '/expenses' ? 'secondary' : 'ghost'}
+        variant="ghost"
         size="sm"
         onClick={() => navigate('/expenses')}
-        className={`gap-2 px-3 relative transition-all duration-200 hover:scale-105 ${
-          location.pathname === '/expenses' ? 'border-b-2 border-secondary' : ''
-        }`}
+        className={navClass('/expenses')}
       >
         <Receipt className="h-4 w-4" />
         Expenses
@@ -72,12 +71,10 @@ export function Navigation() {
 
       {isAdminOrManager && (
         <Button
-          variant={location.pathname === '/approvals' ? 'secondary' : 'ghost'}
+          variant="ghost"
           size="sm"
           onClick={() => navigate('/approvals')}
-          className={`gap-2 px-3 relative transition-all duration-200 hover:scale-105 ${
-            location.pathname === '/approvals' ? 'border-b-2 border-secondary' : ''
-          }`}
+          className={navClass('/approvals')}
         >
           <CheckSquare className="h-4 w-4" />
           Approvals
@@ -85,12 +82,10 @@ export function Navigation() {
       )}
       {isAdminOrManager && (
         <Button
-          variant={location.pathname === '/admin' ? 'secondary' : 'ghost'}
+          variant="ghost"
           size="sm"
           onClick={() => navigate('/admin')}
-          className={`gap-2 px-3 relative transition-all duration-200 hover:scale-105 ${
-            location.pathname === '/admin' ? 'border-b-2 border-secondary' : ''
-          }`}
+          className={navClass('/admin')}
         >
           <Settings className="h-4 w-4" />
           Admin
