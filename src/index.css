@@ -8,26 +8,26 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 215 25% 15%;
+    --background: 210 16% 98%;
+    --foreground: 215 20% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    --card-foreground: 215 20% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover-foreground: 215 20% 12%;
 
-    --primary: 210 50% 25%;
+    --primary: 217 91% 52%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 188 80% 45%;
+    --secondary: 210 100% 50%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 20% 94%;
-    --muted-foreground: 215 15% 45%;
+    --muted: 210 14% 92%;
+    --muted-foreground: 215 14% 48%;
 
-    --accent: 35 100% 55%;
-    --accent-foreground: 215 25% 15%;
+    --accent: 180 100% 45%;
+    --accent-foreground: 215 20% 12%;
 
     --purchase: 142 70% 40%;
     --purchase-foreground: 0 0% 100%;
@@ -35,16 +35,16 @@ All colors MUST be HSL.
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 20% 88%;
-    --input: 210 20% 92%;
-    --ring: 188 80% 45%;
+    --border: 210 14% 90%;
+    --input: 210 14% 94%;
+    --ring: 210 100% 50%;
 
     --radius: 0.75rem;
-    
-    --gradient-primary: linear-gradient(135deg, hsl(210 50% 25%), hsl(210 60% 35%));
-    --gradient-accent: linear-gradient(135deg, hsl(188 80% 45%), hsl(188 80% 55%));
-    --shadow-card: 0 4px 6px -1px hsl(215 25% 15% / 0.1), 0 2px 4px -2px hsl(215 25% 15% / 0.1);
-    --shadow-elevated: 0 10px 25px -5px hsl(215 25% 15% / 0.15), 0 8px 10px -6px hsl(215 25% 15% / 0.1);
+
+    --gradient-primary: linear-gradient(135deg, hsl(217 91% 52%), hsl(210 100% 50%));
+    --gradient-accent: linear-gradient(135deg, hsl(180 100% 45%), hsl(210 100% 50%));
+    --shadow-card: 0 2px 8px -1px hsl(215 20% 12% / 0.08), 0 1px 3px -1px hsl(215 20% 12% / 0.04);
+    --shadow-elevated: 0 12px 32px -4px hsl(215 20% 12% / 0.12), 0 6px 16px -2px hsl(215 20% 12% / 0.06);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 98%;
@@ -111,7 +111,101 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Glassmorphism utilities */
+@layer components {
+  .glass {
+    @apply bg-white/80 backdrop-blur-md border border-white/20;
+  }
+
+  .glass-elevated {
+    @apply bg-white/90 backdrop-blur-xl border border-white/30 shadow-lg;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-lg hover:translate-y-[-2px];
+  }
+
+  .smooth-transition {
+    @apply transition-all duration-300 cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .fade-in {
+    @apply animate-fade-in;
+  }
+
+  .slide-up {
+    @apply animate-slide-up;
+  }
+
+  .slide-down {
+    @apply animate-slide-down;
+  }
+
+  .scale-in {
+    @apply animate-scale-in;
+  }
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
   }
 }

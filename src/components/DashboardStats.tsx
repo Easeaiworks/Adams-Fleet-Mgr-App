@@ -90,7 +90,7 @@ export function DashboardStats() {
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <Card className="shadow-card hover:shadow-elevated transition-all duration-300">
+      <Card className="shadow-card hover:shadow-elevated transition-all duration-300 animate-slide-up" style={{ animationDelay: '0ms', animationFillMode: 'both' }}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total Vehicles</CardTitle>
           <Car className="h-4 w-4 text-secondary" />
@@ -100,8 +100,8 @@ export function DashboardStats() {
           <p className="text-xs text-muted-foreground">Active fleet</p>
         </CardContent>
       </Card>
-      
-      <Card className="shadow-card hover:shadow-elevated transition-all duration-300">
+
+      <Card className="shadow-card hover:shadow-elevated transition-all duration-300 animate-slide-up" style={{ animationDelay: '100ms', animationFillMode: 'both' }}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">This Month</CardTitle>
           <Calendar className="h-4 w-4 text-accent" />
@@ -111,8 +111,8 @@ export function DashboardStats() {
           <p className="text-xs text-muted-foreground">Current month expenses</p>
         </CardContent>
       </Card>
-      
-      <Card className="shadow-card hover:shadow-elevated transition-all duration-300">
+
+      <Card className="shadow-card hover:shadow-elevated transition-all duration-300 animate-slide-up" style={{ animationDelay: '200ms', animationFillMode: 'both' }}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">This Year</CardTitle>
           <TrendingUp className="h-4 w-4 text-primary" />
@@ -122,11 +122,12 @@ export function DashboardStats() {
           <p className="text-xs text-muted-foreground">Year to date</p>
         </CardContent>
       </Card>
-      
+
       {isAdminOrManager ? (
-        <Card 
-          className="shadow-card hover:shadow-elevated transition-all duration-300 cursor-pointer"
+        <Card
+          className="shadow-card hover:shadow-elevated transition-all duration-300 cursor-pointer animate-slide-up"
           onClick={() => navigate('/approvals')}
+          style={{ animationDelay: '300ms', animationFillMode: 'both' }}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Pending Approvals</CardTitle>
@@ -138,7 +139,7 @@ export function DashboardStats() {
           </CardContent>
         </Card>
       ) : (
-        <Card className="shadow-card hover:shadow-elevated transition-all duration-300">
+        <Card className="shadow-card hover:shadow-elevated transition-all duration-300 animate-slide-up" style={{ animationDelay: '300ms', animationFillMode: 'both' }}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">All Time</CardTitle>
             <DollarSign className="h-4 w-4 text-destructive" />
